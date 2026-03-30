@@ -9,6 +9,7 @@ import (
 
 func startRepl() {
 	scanner := bufio.NewScanner(os.Stdin)
+	cfg := &config{}
 	for {
 		fmt.Printf("Pokedex > ")
 		if !scanner.Scan() {
@@ -23,7 +24,7 @@ func startRepl() {
 		cmd := cleanedWords[0]
 		value, exists := getCommands()[cmd]
 		if exists {
-			err := value.callback()
+			err := value.callback(cfg, cleanedWords[1:]...)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -41,4 +42,9 @@ func cleanInput(input string) []string {
 		result = append(result, cleaned)
 	}
 	return result
+}
+
+type config struct {
+	Next     *string
+	Previous *string
 }
