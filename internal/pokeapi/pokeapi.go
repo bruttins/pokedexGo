@@ -93,3 +93,35 @@ type Pokemon struct {
 	Name string `json:"name"`
 	URL  string `json:"url"`
 }
+
+func GetPokemonInfo(name string) (PokemonInfo, error) {
+	url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%s", name)
+	pokemonInfo := PokemonInfo{}
+	if data, ok := cache.Get(url); ok {
+		if err := json.Unmarshal(data, &pokemonInfo); err != nil {
+			return PokemonInfo{}, err
+		}
+	} else {
+		res, err := http.Get(url)
+		if err != nil {
+			return PokemonInfo{}, fmt.Errorf("error: %w", err)
+		}
+		defer res.Body.Close()
+		data, err := io.ReadAll(res.Body)
+		if err != nil {
+			return PokemonInfo{}, err
+		}
+		cache.Add(url, data)
+		if err := json.Unmarshal(data, &pokemonInfo); err != nil {
+			return PokemonInfo{}, err
+		}
+	}
+	return pokemonInfo, nil
+}
+
+type PokemonInfo struct {
+	Name           string `json:"name"`
+	BaseExperience int    `json:"base_experience"`
+	Height         int    `json:"height"`
+	Weight         int    `json:"weight"`
+}

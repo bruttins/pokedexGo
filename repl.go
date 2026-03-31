@@ -5,11 +5,15 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/bruttins/pokedexGo/internal/pokeapi"
 )
 
 func startRepl() {
 	scanner := bufio.NewScanner(os.Stdin)
-	cfg := &config{}
+	cfg := &config{
+		Pokedex: map[string]pokeapi.PokemonInfo{},
+	}
 	for {
 		fmt.Printf("Pokedex > ")
 		if !scanner.Scan() {
@@ -47,4 +51,5 @@ func cleanInput(input string) []string {
 type config struct {
 	Next     *string
 	Previous *string
+	Pokedex  map[string]pokeapi.PokemonInfo
 }
